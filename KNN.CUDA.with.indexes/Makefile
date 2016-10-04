@@ -1,0 +1,6 @@
+knn_cuda_with_indexes.exe: knn_cuda_with_indexes.cu
+	nvcc -o knn_cuda_with_indexes.exe knn_cuda_with_indexes.cu -lcuda -D_CRT_SECURE_NO_DEPRECATE
+
+clean:
+	rm -f *.exe
+
