@@ -28,7 +28,7 @@
 
 
 // If the code is used in Matlab, set MATLAB_CODE to 1. Otherwise, set MATLAB_CODE to 0.
-#define MATLAB_CODE 1  
+#define MATLAB_CODE 0
 
 
 // Includes
@@ -260,10 +260,10 @@ void knn(float* ref_host, int ref_width, float* query_host, int query_width, int
     size_t       ref_pitch_in_bytes;
     size_t       ind_pitch;
     size_t       ind_pitch_in_bytes;
-    size_t       max_nb_query_traited;
+    unsigned int       max_nb_query_traited;
     size_t       actual_nb_query_width;
-    unsigned int memory_total;
-    unsigned int memory_free;
+    size_t memory_total;
+    size_t memory_free;
     
     // CUDA Initialisation
     cuInit(0);
