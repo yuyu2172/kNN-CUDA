@@ -82,3 +82,29 @@ ORGANISATION OF DATA
 		    | 1 2 |
 		A = | 3 4 |
 		    | 5 6 |
+
+
+Speed
+=====
+
+
+
+  ```
+  CUDA
+
+  Number of reference points      :   4096
+  Number of query points          :   4096
+  Dimension of points             :   32
+  Number of neighbors to consider :   20
+  Processing kNN search           : done in 15.662722 s for 100 iterations (0.156627 s by iteration)
+
+
+  cuBLAS
+
+  Number of reference points      :   4096   
+  Number of query points          :   4096 
+  Dimension of points             :   32 
+  Number of neighbors to consider :   20 
+  Processing kNN search           : done in 12.456899 s for 100 iterations (0.124569 s by iteration)
+  ```
+
