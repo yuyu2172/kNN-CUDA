@@ -108,3 +108,49 @@ Speed
   Processing kNN search           : done in 12.456899 s for 100 iterations (0.124569 s by iteration)
   ```
 
+
+## use_texture
+
+```
+Time(%)      Time     Calls       Avg       Min       Max  Name                                           
+ 78.15%  1.23364s       100  12.336ms  12.279ms  12.389ms  cuInsertionSort(float*, int, int*, int, int, in
+t, int)                                                                                                   
+ 20.09%  317.18ms       100  3.1718ms  3.1694ms  3.1745ms  cuComputeDistanceTexture(int, float*, int, int,
+ int, float*)                                                                                             
+  0.63%  10.023ms       200  50.116us  49.761us  57.730us  [CUDA memcpy DtoH]                             
+  0.55%  8.6914ms       100  86.914us  86.466us  91.651us  [CUDA memcpy HtoA]                             
+  0.55%  8.6361ms       100  86.361us  85.794us  92.802us  [CUDA memcpy HtoD]                             
+  0.02%  382.09us       100  3.8200us  3.6480us  4.0960us  cuParallelSqrt(float*, int, int, int)          
+```
+
+
+##  no use_texture
+```
+==30641== Profiling result:                                                                               
+Time(%)      Time     Calls       Avg       Min       Max  Name                                           
+ 88.46%  1.19670s       100  11.967ms  11.921ms  11.993ms  cuInsertionSort(float*, int, int*, int, int, in
+t, int)                                                                                                   
+  9.49%  128.35ms       100  1.2835ms  1.2822ms  1.2846ms  cuComputeDistanceGlobal(float*, int, int, float
+*, int, int, int, float*)                                                                                 
+  1.28%  17.344ms       200  86.717us  86.306us  93.058us  [CUDA memcpy HtoD]                             
+  0.74%  10.022ms       200  50.110us  49.761us  61.282us  [CUDA memcpy DtoH]                             
+  0.03%  380.90us       100  3.8080us  3.6160us  4.1280us  cuParallelSqrt(float*, int, int, int)          
+```
+
+## CUBLAS
+
+```
+Time(%)      Time     Calls       Avg       Min       Max  Name                                           
+ 89.75%  1.21083s       100  12.108ms  12.054ms  12.166ms  cuInsertionSort(float*, int, int*, int, int, in
+t, int)                                                                                                   
+  4.50%  60.706ms       100  607.06us  598.16us  612.56us  cuAddRNorm(float*, int, int, int, float*)      
+  2.64%  35.649ms       100  356.49us  342.28us  375.15us  maxwell_sgemm_128x128_raggedMn_nt              
+  1.29%  17.369ms       201  86.413us  1.2160us  92.674us  [CUDA memcpy HtoD]                             
+  1.02%  13.788ms       100  137.88us  137.73us  138.05us  cuAddQNormAndSqrt(float*, int, int, float*, int
+)                                                                                                         
+  0.74%  10.023ms       200  50.115us  49.505us  52.354us  [CUDA memcpy DtoH]                             
+  0.05%  679.41us       200  3.3970us  3.1360us  3.7440us  cuComputeNorm(float*, int, int, int, float*)   
+                                                                                                    ```
+
+
+

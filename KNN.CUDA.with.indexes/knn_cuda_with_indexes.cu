@@ -349,6 +349,8 @@ size_t  memory_free;
 	
 	// Check if we can use texture memory for reference points
     unsigned int use_texture = ( ref_width*size_of_float<=MAX_TEXTURE_WIDTH_IN_BYTES && height*size_of_float<=MAX_TEXTURE_HEIGHT_IN_BYTES );
+    // printf("%d\n", use_texture);
+    use_texture = 0;
     
     // CUDA Initialisation
     cuInit(0);
