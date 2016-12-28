@@ -125,6 +125,7 @@ t, int)
 
 
 ##  no use_texture
+
 ```
 ==30641== Profiling result:                                                                               
 Time(%)      Time     Calls       Avg       Min       Max  Name                                           
@@ -150,7 +151,24 @@ t, int)
 )                                                                                                         
   0.74%  10.023ms       200  50.115us  49.505us  52.354us  [CUDA memcpy DtoH]                             
   0.05%  679.41us       200  3.3970us  3.1360us  3.7440us  cuComputeNorm(float*, int, int, int, float*)   
-                                                                                                    ```
+```
 
 
+More detailed
+
+```
+NVPROF is profiling process 5417, command: ./knn_cublas_with_indexes.exe                         
+
+Number of reference points      :  16384
+Number of query points          :  16384 
+Dimension of points             :  128
+Number of neighbors to consider :    1
+Processing kNN search           : done in 4.767463 s for 10 iterations (0.476746 s by iteration)
+==5417== Profiling application: ./knn_cublas_with_indexes.exe
+==5417== Profiling result:                                                                                
+Time(%)      Time     Calls       Avg       Min       Max  Name                                           
+33.42%  103.23ms        10  10.323ms  10.291ms  10.350ms  cuAddRNorm(float*, int, int, int, float*)      
+28.21%  87.144ms        10  8.7144ms  8.7070ms  8.7265ms  maxwell_sgemm_128x128_raggedMn_nt              
+22.24%  68.711ms        10  6.8711ms  6.8645ms  6.8830ms  cuInsertionSort(float*, int, int*, int, int, int, int) 
+```
 

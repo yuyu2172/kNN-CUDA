@@ -431,11 +431,11 @@ int main(void){
     float* query;               // Pointer to query point array
     float* dist;                // Pointer to distance array
 	int*   ind;                 // Pointer to index array
-	int    ref_nb     = 4096;   // Reference point number, max=65535
-	int    query_nb   = 4096;   // Query point number,     max=65535
-	int    dim        = 32;     // Dimension of points,    max=8192
-	int    k          = 20;     // Nearest neighbors to consider
-	int    iterations = 100;
+	int    ref_nb     = 16384;   // Reference point number, max=65535
+	int    query_nb   = 16384;   // Query point number,     max=65535
+	int    dim        = 128;     // Dimension of points,    max=8192
+	int    k          = 1;     // Nearest neighbors to consider
+	int    iterations = 10;
 	int    i;
 	
 	// Memory allocation
