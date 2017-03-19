@@ -126,6 +126,16 @@ def load_kernel(kernel_name, code, options=()):
 
 
 def insertion_sort(dist, k):
+    """Argsort along rows of dist to get smallest k elements.
+
+    Args:
+        dist (~cupy.ndarray): An array of shape (n_query, n_ref).
+        k (int): number of neighbors to search for.
+
+    Returns:
+        Indexes of the k nearest neighbors. This is an array of shape (n_query, k).
+    
+    """
     H, W = dist.shape
     dist = dist.astype(np.float32)
     dist = cupy.asfortranarray(dist)
@@ -138,7 +148,7 @@ def insertion_sort(dist, k):
     grid = (H / 32, 1, 1)
     block = (32, 1, 1)
     kernel(grid=grid, block=block, args=args)
-    ind -= 1
+    ind -= 1  # make indices to start from 0
     return ind
 
 
