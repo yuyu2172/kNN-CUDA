@@ -52,7 +52,7 @@ __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_p
 	// Variables
     int l, i, j;
     float *p_dist;
-	  int   *p_ind;
+	int   *p_ind;
     float curr_dist, max_dist;
     int   curr_row,  max_row;
     unsigned int xIndex = blockIdx.x * blockDim.x + threadIdx.x;
@@ -61,7 +61,7 @@ __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_p
         
         // Pointer shift, initialization, and max value
         p_dist   = dist + xIndex;
-		    p_ind    = ind  + xIndex;
+		p_ind    = ind  + xIndex;
         max_dist = p_dist[0];
         p_ind[0] = 1;
         
@@ -97,15 +97,15 @@ __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_p
                 i=k-1;
                 for (int a=0; a<k-1; a++){
                     if (p_dist[a*dist_pitch]>curr_dist){
-						            i=a;
-						            break;
-					          }
-				        }
+						i=a;
+						break;
+					}
+				}
                 for (j=k-1; j>i; j--){
-					          p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
-					          p_ind[j*ind_pitch]   = p_ind[(j-1)*ind_pitch];
+				    p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
+					p_ind[j*ind_pitch]   = p_ind[(j-1)*ind_pitch];
                 }
-				        p_dist[i*dist_pitch] = curr_dist;
+			    p_dist[i*dist_pitch] = curr_dist;
                 p_ind[i*ind_pitch]   = l+1;
                 max_dist             = p_dist[max_row];
             }
@@ -137,10 +137,26 @@ def insertion_sort(dist, k):
     return ind
 
 
+def expected_cpu(dist, k):
+    dist_cpu = dist.get()
+    arg_sorted = np.argsort(dist_cpu, axis=1)
+
+    arg_sorted[:, k:] = 0
+    return arg_sorted
+
+
+def test(dist, k):
+    ind = insertion_sort(dist, k)
+    expected = expected_cpu(dist, k)
+    np.testing.assert_equal(ind.get(), expected)
+
 
 if __name__ == '__main__':
+    k = 1
     dist = cupy.arange(512 * 512).reshape(512, 512)
-    print dist
-    ind = insertion_sort(dist, 1)
-    print ind
+    test(dist, k)
+    dist = dist[:, ::-1]
+    test(dist, k)
+
+
 
