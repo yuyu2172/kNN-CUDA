@@ -46,6 +46,8 @@ code = '''
   * @param height      height of the distance matrix and of the index matrix
   * @param k           number of neighbors to consider
   */
+#include <stdio.h>
+
 extern "C"
 __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_pitch, int width, int height, int k){
 
@@ -68,26 +70,27 @@ __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_p
         // Part 1 : sort kth firt elementZ
         for (l=1; l<k; l++){
             curr_row  = l * dist_pitch;
-			      curr_dist = p_dist[curr_row];
+			curr_dist = p_dist[curr_row];
             if (curr_dist<max_dist){
-              i=l-1;
-              for (int a=0; a<l-1; a++){
-                  if (p_dist[a*dist_pitch]>curr_dist){
-                      i=a;
-                      break;
-                  }
-              }
-              for (j=l; j>i; j--){
-                  p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
-                  p_ind[j*ind_pitch]   = p_ind[(j-1)*ind_pitch];
-              }
-              p_dist[i*dist_pitch] = curr_dist;
-              p_ind[i*ind_pitch]   = l+1;
+                i=l-1;
+                for (int a=0; a<l-1; a++){
+                    if (p_dist[a*dist_pitch]>curr_dist){
+                        i=a;
+                        break;
+                    }
+                }
+                for (j=l; j>i; j--){
+                    p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
+                    p_ind[j*ind_pitch]   = p_ind[(j-1)*ind_pitch];
+                }
+                p_dist[i*dist_pitch] = curr_dist;
+                p_ind[i*ind_pitch]   = l+1;
             }
-            else
+            else {
                 p_ind[l*ind_pitch] = l+1;
-                max_dist = p_dist[curr_row];
-          }
+            }
+            max_dist = p_dist[curr_row];
+        }
         
         // Part 2 : insert element in the k-th first lines
         max_row = (k-1)*dist_pitch;
@@ -102,10 +105,10 @@ __global__ void cuInsertionSort(float *dist, int dist_pitch, int *ind, int ind_p
 					}
 				}
                 for (j=k-1; j>i; j--){
-				    p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
+					p_dist[j*dist_pitch] = p_dist[(j-1)*dist_pitch];
 					p_ind[j*ind_pitch]   = p_ind[(j-1)*ind_pitch];
                 }
-			    p_dist[i*dist_pitch] = curr_dist;
+				        p_dist[i*dist_pitch] = curr_dist;
                 p_ind[i*ind_pitch]   = l+1;
                 max_dist             = p_dist[max_row];
             }
@@ -125,38 +128,36 @@ def load_kernel(kernel_name, code, options=()):
 def insertion_sort(dist, k):
     H, W = dist.shape
     dist = dist.astype(np.float32)
-    dist = cupy.asfortranarray(dist)
+    # dist = cupy.asfortranarray(dist)
+    dist = cupy.ascontiguousarray(dist)
 
-    ind = cupy.zeros((H, W), dtype=np.int32, order='F')
+    ind = cupy.zeros((W, k), dtype=np.int32, order='F')
     args = (dist, W, ind, W, W, H, k)
 
     kernel = load_kernel('cuInsertionSort', code)
-    grid = (W / 256, 1, 1)
-    block = (256, 1, 1)
+    grid = (W / 32, 1, 1)
+    block = (32, 1, 1)
     kernel(grid=grid, block=block, args=args)
+    ind -= 1
     return ind
-
-
-def expected_cpu(dist, k):
-    dist_cpu = dist.get()
-    arg_sorted = np.argsort(dist_cpu, axis=1)
-
-    arg_sorted[:, k:] = 0
-    return arg_sorted
 
 
 def test(dist, k):
     ind = insertion_sort(dist, k)
-    expected = expected_cpu(dist, k)
-    np.testing.assert_equal(ind.get(), expected)
+
+    dist_cpu = dist.get()
+    keys = np.argsort(dist_cpu, axis=0)
+    np.testing.assert_equal(keys[:k].T, ind.get())
 
 
 if __name__ == '__main__':
-    k = 1
-    dist = cupy.arange(512 * 512).reshape(512, 512)
+    k = 5
+    # (query)
+    shape = (64, 32)
+    dist = cupy.arange(np.prod(shape)).reshape(*shape)
+    dist = cupy.asfortranarray(dist)
     test(dist, k)
-    dist = dist[:, ::-1]
+
+    dist = cupy.arange(np.prod(shape)).reshape(*shape)
+    dist = dist[::-1]
     test(dist, k)
-
-
-
