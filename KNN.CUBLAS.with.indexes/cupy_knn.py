@@ -128,14 +128,14 @@ def load_kernel(kernel_name, code, options=()):
 def insertion_sort(dist, k):
     H, W = dist.shape
     dist = dist.astype(np.float32)
-    # dist = cupy.asfortranarray(dist)
-    dist = cupy.ascontiguousarray(dist)
+    dist = cupy.asfortranarray(dist)
+    #dist = cupy.ascontiguousarray(dist)
 
-    ind = cupy.zeros((W, k), dtype=np.int32, order='F')
-    args = (dist, W, ind, W, W, H, k)
+    ind = cupy.zeros((H, k), dtype=np.int32, order='F')
+    args = (dist, H, ind, H, H, W, k)
 
     kernel = load_kernel('cuInsertionSort', code)
-    grid = (W / 32, 1, 1)
+    grid = (H / 32, 1, 1)
     block = (32, 1, 1)
     kernel(grid=grid, block=block, args=args)
     ind -= 1
@@ -146,18 +146,18 @@ def test(dist, k):
     ind = insertion_sort(dist, k)
 
     dist_cpu = dist.get()
-    keys = np.argsort(dist_cpu, axis=0)
-    np.testing.assert_equal(keys[:k].T, ind.get())
+    keys = np.argsort(dist_cpu, axis=1)
+    np.testing.assert_equal(keys[:, :k], ind.get())
 
 
 if __name__ == '__main__':
     k = 5
-    # (query)
-    shape = (64, 32)
+    # (query, ref)
+    shape = (32, 64)
     dist = cupy.arange(np.prod(shape)).reshape(*shape)
     dist = cupy.asfortranarray(dist)
     test(dist, k)
 
     dist = cupy.arange(np.prod(shape)).reshape(*shape)
-    dist = dist[::-1]
+    dist = dist[:, ::-1]
     test(dist, k)
